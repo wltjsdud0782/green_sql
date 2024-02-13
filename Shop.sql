@@ -42,6 +42,13 @@ CREATE TABLE SHOP_ITEM(
 	, CATE_CODE INT NOT NULL REFERENCES item_category (CATE_CODE)
 );
 
+ALTER TABLE shop_item ADD COLUMN ITEM_STATUS INT DEFAULT 1; -- 상품 상태 컬럼 추가
+-- 준비중:1 / 판매중:2 / 매진:3
+ALTER TABLE shop_item DROP COLUMN ITEM_STATUS;
+
+SELECT * FROM shop_item;
+UPDATE shop_item SET ITEM_STATUS = 2;
+
 -- 상품 이미지 정보 관리 테이블
 CREATE TABLE ITEM_IMAGE (
    IMG_CODE INT AUTO_INCREMENT PRIMARY KEY
@@ -223,3 +230,25 @@ SELECT BUY_CODE
    , (SELECT BUY_DATE FROM shop_buy WHERE BUY_CODE = BD.BUY_CODE) BUY_DATE
    , (SELECT BUY_PRICE FROM shop_buy WHERE BUY_CODE = BD.BUY_CODE) BUY_PRICE
 FROM buy_detail BD;
+-- -----------------------------------------------------------------------------
+-- DATETIME 자료형 WHERE 절 만들기
+SELECT
+*
+FROM shop_buy
+WHERE MEMBER_ID LIKE '%A%'
+AND DATE_FORMAT(BUY_DATE, '%Y-%m-%d') = '2024-02-02'
+ORDER BY BUY_DATE DESC;
+
+SELECT * FROM shop_buy
+WHERE DATE_FORMAT(BUY_DATE, '%Y-%m-%d') = '2024-02-02';
+
+-- 문자열 → 날짜
+SELECT
+   STR_TO_DATE('2000-01-01', BUY_DATE)
+FROM shop_buy;
+
+-- 날짜 → 문자열
+SELECT
+   DATE_FORMAT(BUY_DATE, '%Y-%m-%d')
+   , DATE_FORMAT(BUY_DATE, '%Y-%m-%d %h:%i:%s')
+FROM shop_buy;
