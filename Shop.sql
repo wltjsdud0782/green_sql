@@ -253,3 +253,16 @@ SELECT
    DATE_FORMAT(BUY_DATE, '%Y-%m-%d')
    , DATE_FORMAT(BUY_DATE, '%Y-%m-%d %h:%i:%s')
 FROM shop_buy;
+
+-- 준비중:1 / 판매중:2 / 매진:3
+SELECT ITEM_CODE
+   , ITEM_NAME
+   , ITEM_STOCK
+   , ITEM_STATUS
+   , IF(ITEM_STATUS=1, '준비중', IF(ITEM_STATUS=2, '판매중', '매진')) '상태'
+   , CASE
+      WHEN ITEM_STATUS=1 THEN '준비중'
+      WHEN ITEM_STATUS=2 THEN '판매중'
+      ELSE '매진'
+      END '상태2'
+FROM shop_item;
