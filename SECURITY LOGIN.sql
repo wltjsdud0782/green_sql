@@ -10,3 +10,5 @@ CREATE TABLE SECURITY_MEMBER (
 
 SELECT * FROM security_member;
 DROP TABLE security_member;
+
+COMMIT;
