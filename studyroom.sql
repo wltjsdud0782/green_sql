@@ -132,14 +132,66 @@ CREATE TABLE BOARD_IMG (
 	, BOARD_CODE INT NOT NULL REFERENCES STUDYROOM_BOARD (BOARD_CODE)
 );
 
-
-CREATE TABLE a (
-b INT DEFAULT 1
-);
-INSERT INTO a (b) VALUES (3);
-DROP TABLE a;
-
-
+-- 현재 날짜
 SELECT DATE_FORMAT(now(), '%Y-%m-%d') FROM DUAL;
-SELECT date_add(DATE_FORMAT(now(), '%Y-%m-%d'),INTERVAL (SELECT b FROM a) DAY) FROM DUAL;
+
+-- 더하는 쿼리
+SELECT date_add(DATE_FORMAT(now(), '%Y-%m-%d'),INTERVAL 3 DAY) FROM DUAL;
+
+-- 날짜 사이 일 수 차이 구하는 쿼리
+SELECT TIMESTAMPDIFF(DAY, '2017-03-01', '2018-03-28');
+
+
+
+
+
+-- 로그인 한 회원의 이용권 결제일 ---------------------------------------------------
+SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6;
+-- ----------------------------------------------------------------------------------
+-- 로그인 한 회원의 며칠이용권인지? -------------------------------------------------
+SELECT CHARGE_DATE
+FROM STUDYROOM_CHARGE CHARGE
+INNER JOIN APPROVAL APP
+ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
+WHERE
+APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6);
+-- ----------------------------------------------------------------------------------
+-- END_DATE 식 = 로그인 한 회원의 이용권이 끝나는 날짜 --------------------------------------------------------------------------------------------------------
+SELECT
+	(SELECT DATE_ADD(
+		(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+		, INTERVAL (
+						SELECT CHARGE_DATE
+						FROM STUDYROOM_CHARGE CHARGE
+						INNER JOIN APPROVAL APP
+						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
+						WHERE
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+						) DAY)
+							) AS END_DATE
+FROM approval
+WHERE MEMBER_CODE = 6;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- REMAIN_DATE 식 = 로그인 한 회원의 남은날짜 -----------------------------------------------------------------------------------------------------------------
+SELECT
+	TIMESTAMPDIFF(
+		DAY, DATE_FORMAT(now(), '%Y-%m-%d')
+		, (SELECT
+			(SELECT DATE_ADD(
+			(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+			, INTERVAL (
+						SELECT CHARGE_DATE
+						FROM STUDYROOM_CHARGE CHARGE
+						INNER JOIN APPROVAL APP
+						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
+						WHERE
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+						) DAY)
+							) AS END_DATE
+FROM approval
+WHERE MEMBER_CODE = 6)
+	) AS REMAIN_DATE
+FROM approval
+WHERE MEMBER_CODE = 6;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
