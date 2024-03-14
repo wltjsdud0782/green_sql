@@ -98,6 +98,7 @@ CREATE TABLE STUDYROOM_CHARGE (
 	, CHARGE_FEE INT NOT NULL
 );
 ALTER TABLE STUDYROOM_CHARGE ADD COLUMN CHARGE_DATE INT NOT NULL AFTER CHARGE_FEE;
+ALTER TABLE STUDYROOM_CHARGE CHANGE CHARGE_NAME CHARGE_NAME VARCHAR(50) NOT NULL;
 
 INSERT INTO STUDYROOM_CHARGE VALUES(1, '30일', 220000, 30);
 INSERT INTO STUDYROOM_CHARGE VALUES(2, '21일', 180000, 21);
@@ -113,7 +114,7 @@ CREATE TABLE STUDYROOM_BOARD (
 	, BOARD_DATE DATETIME DEFAULT CURRENT_TIMESTAMP
 	, BOARD_CONTENT VARCHAR(200)
 	, BOARD_SECRET VARCHAR(10) DEFAULT 'NO' -- YES : 비밀글 , NO : 공개글
-	, BOARD_ANSER VARCHAR(10_ DEFAULT 'NO' -- 답변 유무
+	, BOARD_ANSER VARCHAR(10) DEFAULT 'NO' -- 답변 유무
 );
 
 CREATE TABLE STUDYROOM_COMMENT (
@@ -133,10 +134,10 @@ CREATE TABLE BOARD_IMG (
 );
 
 -- 현재 날짜
-SELECT DATE_FORMAT(now(), '%Y-%m-%d') FROM DUAL;
+SELECT DATE_FORMAT(now(), '%Y-%m-%d');
 
 -- 더하는 쿼리
-SELECT date_add(DATE_FORMAT(now(), '%Y-%m-%d'),INTERVAL 3 DAY) FROM DUAL;
+SELECT date_add(DATE_FORMAT(now(), '%Y-%m-%d'),INTERVAL 3 DAY);
 
 -- 날짜 사이 일 수 차이 구하는 쿼리
 SELECT TIMESTAMPDIFF(DAY, '2017-03-01', '2018-03-28');
@@ -194,4 +195,25 @@ WHERE MEMBER_CODE = 6)
 FROM approval
 WHERE MEMBER_CODE = 6;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+-- 이용권 만료 시 데이터 지우기 -------------------------------------------------------------------------------------------------------------------------------
+IF(ITEM_STATUS=1, '준비중', IF(ITEM_STATUS=2, '판매중', '매진')) '상태';
+SELECT
+	IF(
+		(SELECT
+			(SELECT DATE_ADD(
+				(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+				, INTERVAL (
+					SELECT
+						CHARGE_DATE
+						FROM STUDYROOM_CHARGE CHARGE
+						INNER JOIN APPROVAL APP
+						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
+						WHERE
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+					) DAY)
+			)
+		FROM approval
+		WHERE MEMBER_CODE = 6) < (SELECT DATE_FORMAT(now(), '%Y-%m-%d'))
+	, '만료일이 오늘보다 이전'
+	, '만료일이 오늘보다 이후' )AS EXPIRES;
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------------
