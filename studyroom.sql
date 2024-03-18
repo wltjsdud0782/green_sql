@@ -217,3 +217,17 @@ SELECT
 	, '만료일이 오늘보다 이전'
 	, '만료일이 오늘보다 이후' )AS EXPIRES;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SELECT
+	MEMBER_CODE
+	, CASE
+      WHEN IS_ADMIN='USER' THEN '회원'
+      WHEN IS_ADMIN='AREBEIT' THEN '알바생'
+      WHEN IS_ADMIN='ADMIN' THEN '관리자'
+      END IS_ADMIN
+FROM studyroom_member
+WHERE (CASE
+      WHEN IS_ADMIN='USER' THEN '회원'
+      WHEN IS_ADMIN='AREBEIT' THEN '알바생'
+      WHEN IS_ADMIN='ADMIN' THEN '관리자'
+      END) = '관리자';
