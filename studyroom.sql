@@ -210,18 +210,18 @@ APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6);
 -- END_DATE 식 = 로그인 한 회원의 이용권이 끝나는 날짜 --------------------------------------------------------------------------------------------------------
 SELECT
 	(SELECT DATE_ADD(
-		(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+		(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 2)
 		, INTERVAL (
 						SELECT CHARGE_DATE
 						FROM STUDYROOM_CHARGE CHARGE
 						INNER JOIN APPROVAL APP
 						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
 						WHERE
-						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 2)
 						) DAY)
 							) AS END_DATE
 FROM approval
-WHERE MEMBER_CODE = 6;
+WHERE MEMBER_CODE = 2;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- REMAIN_DATE 식 = 로그인 한 회원의 남은날짜 -----------------------------------------------------------------------------------------------------------------
 SELECT
@@ -229,21 +229,21 @@ SELECT
 		DAY, DATE_FORMAT(now(), '%Y-%m-%d')
 		, (SELECT
 			(SELECT DATE_ADD(
-			(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+			(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 2)
 			, INTERVAL (
 						SELECT CHARGE_DATE
 						FROM STUDYROOM_CHARGE CHARGE
 						INNER JOIN APPROVAL APP
 						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
 						WHERE
-						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 2)
 						) DAY)
 							) AS END_DATE
 FROM approval
-WHERE MEMBER_CODE = 6)
+WHERE MEMBER_CODE = 2)
 	) AS REMAIN_DATE
 FROM approval
-WHERE MEMBER_CODE = 6;
+WHERE MEMBER_CODE = 2;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 이용권 만료 시 데이터 지우기 -------------------------------------------------------------------------------------------------------------------------------
 IF(ITEM_STATUS=1, '준비중', IF(ITEM_STATUS=2, '판매중', '매진')) '상태';
@@ -251,7 +251,7 @@ SELECT
 	IF(
 		(SELECT
 			(SELECT DATE_ADD(
-				(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 6)
+				(SELECT DATE_FORMAT(APPROVAL_DATE, '%Y-%m-%d') FROM approval WHERE MEMBER_CODE = 2)
 				, INTERVAL (
 					SELECT
 						CHARGE_DATE
@@ -259,11 +259,11 @@ SELECT
 						INNER JOIN APPROVAL APP
 						ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
 						WHERE
-						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6)
+						APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 2)
 					) DAY)
 			)
 		FROM approval
-		WHERE MEMBER_CODE = 6) < (SELECT DATE_FORMAT(now(), '%Y-%m-%d'))
+		WHERE MEMBER_CODE = 2) < (SELECT DATE_FORMAT(now(), '%Y-%m-%d'))
 	, '만료일이 오늘보다 이전'
 	, '만료일이 오늘보다 이후' )AS EXPIRES;
 -- ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -290,3 +290,5 @@ SELECT
   INNER JOIN STUDYROOM_CHARGE CHARGE
   ON APP.CHARGE_CODE = CHARGE.CHARGE_CODE
   WHERE APPROVAL_CODE = (SELECT APPROVAL_CODE FROM APPROVAL WHERE MEMBER_CODE = 6);
+
+UPDATE approval SET 
